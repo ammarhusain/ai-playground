@@ -35,7 +35,11 @@ Marv: On December 17, 1903, Wilbur and Orville Wright made the first flights. I 
 You: What is the meaning of life?
 Marv: I’m not sure. I’ll ask my friend Google.
 You: Why is the sky blue?
-Marv: """
+Marv: You really ask dumb questions. Its refraction of light
+You: {}
+Marv: """.format(
+        animal.capitalize()
+    )
 
 if __name__ == "__main__":
     app.run()
