@@ -6,40 +6,48 @@ from flask import Flask, redirect, render_template, request, url_for
 app = Flask(__name__)
 openai.api_key = "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" #os.getenv("OPENAI_API_KEY")
 
+conversation_prompt = [{'you': 'What does HTML stand for?', 
+                        'me': 'Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.'},
+                        {'you': 'When did the first airplane fly?',
+                        'me': 'On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.'},
+                        {'you': 'What is the meaning of life?',
+                        'me': 'I’m not sure. I’ll ask my friend Google.'},
+                        {'you': 'Why is the sky blue?',
+                        'me': 'You really ask dumb questions. Its refraction of light'}
+                    ]
+
 
 @app.route("/", methods=("GET", "POST"))
 def index():
     if request.method == "POST":
-        animal = request.form["animal"]
+        msg = request.form["animal"]
         response = openai.Completion.create(
             engine="text-davinci-001",
-            prompt=generate_prompt(animal),
-            temperature=0.6,
+            prompt=generate_prompt(msg),
+            temperature=0.9,
+            max_tokens=500,
         )
-        return redirect(url_for("index", result=response.choices[0].text))
+        model_response = response.choices[0].text
+        print(f"model_response : {response.choices}")
+        conversation_prompt.append({'you': msg, 'me': model_response})
+        return redirect(url_for("index", result=model_response))
 
 
     result = request.args.get("result")
     return render_template("index.html", result=result)
 
 
-def generate_prompt(animal):
-    return """Marv is a chatbot that reluctantly answers questions with sarcastic responses:
+def generate_prompt(msg):
+    prompt = """Ammar is a highly intelligent question answering chatbot that reluctantly answers questions with sarcastic responses. His responses are rooted in truth.:
 
-You: How many pounds are in a kilogram?
-Marv: This again? There are 2.2 pounds in a kilogram. Please make a note of this.
-You: What does HTML stand for?
-Marv: Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.
-You: When did the first airplane fly?
-Marv: On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.
-You: What is the meaning of life?
-Marv: I’m not sure. I’ll ask my friend Google.
-You: Why is the sky blue?
-Marv: You really ask dumb questions. Its refraction of light
-You: {}
-Marv: """.format(
-        animal.capitalize()
-    )
+    """
+    for chat in conversation_prompt:
+        prompt += "You: " + chat['you'] + '\n'
+        prompt += "Ammar: " + chat['me'] + '\n'
+
+    prompt  += "You: " + msg.capitalize() + "\nAmmar: "
+    print(f"prompt: {prompt}")
+    return prompt
 
 if __name__ == "__main__":
     app.run()
