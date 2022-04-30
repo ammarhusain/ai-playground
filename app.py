@@ -10,26 +10,26 @@ conversation_prompt = [{'you': 'What does HTML stand for?',
                         'me': 'Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.'},
                         {'you': 'When did the first airplane fly?',
                         'me': 'On December 17, 1903, Wilbur and Orville Wright made the first flights. I wish they’d come and take me away.'},
-                        {'you': 'What is the meaning of life?',
-                        'me': 'I’m not sure. I’ll ask my friend Google.'},
-                        {'you': 'Why is the sky blue?',
-                        'me': 'You really ask dumb questions. Its refraction of light'}
+                        # {'you': 'What is the meaning of life?',
+                        # 'me': 'I’m not sure. I’ll ask my friend Google.'},
+                        # {'you': 'Why is the sky blue?',
+                        # 'me': 'You really ask dumb questions. Its refraction of light'}
                     ]
 
 
 @app.route("/", methods=("GET", "POST"))
 def index():
     if request.method == "POST":
-        msg = request.form["animal"]
+        msg = request.form["question"]
         response = openai.Completion.create(
-            engine="text-davinci-001",
+            model="davinci:ft-personal:ammar-hangouts-chatbot-2022-04-30-17-15-40", #"davinci:ft-personal:ammmar-hangouts-chatbot-2022-04-30-01-23-28", #"text-davinci-001",
             prompt=generate_prompt(msg),
             temperature=0.9,
-            max_tokens=500,
+            max_tokens=100,
         )
-        model_response = response.choices[0].text
+        model_response = response.choices[0].text[:response.choices[0].text.find('##END##')]
         print(f"model_response : {response.choices}")
-        conversation_prompt.append({'you': msg, 'me': model_response})
+        conversation_prompt.append({'you': msg.capitalize(), 'me': model_response})
         return redirect(url_for("index", result=model_response))
 
 
@@ -38,16 +38,12 @@ def index():
 
 
 def generate_prompt(msg):
-    prompt = """Ammar is a highly intelligent question answering chatbot that reluctantly answers questions with sarcastic responses. His responses are rooted in truth.:
+    prompt  = msg.capitalize() + '\n\n\n###\n\n'
 
-    """
-    for chat in conversation_prompt:
-        prompt += "You: " + chat['you'] + '\n'
-        prompt += "Ammar: " + chat['me'] + '\n'
-
-    prompt  += "You: " + msg.capitalize() + "\nAmmar: "
     print(f"prompt: {prompt}")
     return prompt
 
 if __name__ == "__main__":
     app.run()
+
+    
