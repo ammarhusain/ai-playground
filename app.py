@@ -20,21 +20,26 @@ conversation_prompt = [{'you': 'What does HTML stand for?',
 @app.route("/", methods=("GET", "POST"))
 def index():
     if request.method == "POST":
-        msg = request.form["question"]
-        response = openai.Completion.create(
-            model="davinci:ft-personal:ammar-hangouts-chatbot-2022-04-30-17-15-40", #"davinci:ft-personal:ammmar-hangouts-chatbot-2022-04-30-01-23-28", #"text-davinci-001",
-            prompt=generate_prompt(msg),
-            temperature=0.9,
-            max_tokens=100,
-        )
-        model_response = response.choices[0].text[:response.choices[0].text.find('##END##')]
-        print(f"model_response : {response.choices}")
-        conversation_prompt.append({'you': msg.capitalize(), 'me': model_response})
-        return redirect(url_for("index", result=model_response))
+        ammar_question = request.form["ammar-question"]
+        if len(ammar_question) > 0:
+            response = openai.Completion.create(
+                model="davinci:ft-personal:ammar-hangouts-chatbot-2022-04-30-17-15-40", #"davinci:ft-personal:ammmar-hangouts-chatbot-2022-04-30-01-23-28", #"text-davinci-001",
+                prompt=generate_prompt(ammar_question),
+                temperature=0.9,
+                max_tokens=100,
+            )
+            model_response = response.choices[0].text[:response.choices[0].text.find('##END##')]
+            print(f"model_response : {response.choices}")
+            conversation_prompt.append({'you': ammar_question.capitalize(), 'me': model_response})
+            return redirect(url_for("index", ammar_result=model_response))
+        generic_question = request.form["generic-question"]
+        if len(generic_question) > 0:
+            print(f"Trying to answer {generic_question}")
+            return redirect(url_for("index", generic_result="No fucking idea"))
 
-
-    result = request.args.get("result")
-    return render_template("index.html", result=result)
+    return render_template("index.html", 
+        ammar_result=request.args.get("ammar_result"),
+        generic_result=request.args.get("generic_result"))
 
 
 def generate_prompt(msg):
