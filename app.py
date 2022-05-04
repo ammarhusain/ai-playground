@@ -4,7 +4,7 @@ import openai
 from flask import Flask, redirect, render_template, request, url_for
 
 app = Flask(__name__)
-openai.api_key = "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" #os.getenv("OPENAI_API_KEY")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 generic_conversation_buffer = [{'you': 'What does HTML stand for?', 
                         'me': 'Was Google too busy? Hypertext Markup Language. The T is for try to ask better questions in the future.'},
