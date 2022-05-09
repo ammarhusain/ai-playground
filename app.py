@@ -31,7 +31,7 @@ def index():
             )
             ammar_response = response.choices[0].text[:response.choices[0].text.find('##END##')]
             print(f"Ammar-bot model_response : {response.choices}")
-            return redirect(url_for("index", ammar_result=ammar_response))
+            return redirect(url_for("index", ammar_prompt=ammar_question, ammar_result=ammar_response))
 
         # Check for questions to Generic-Bot
         generic_question = request.form["generic-question"]
@@ -45,12 +45,15 @@ def index():
             )
             generic_response = response.choices[0].text[:response.choices[0].text.find('##END##')]
             generic_conversation_buffer.append({'you': generic_question.capitalize(), 'me': generic_response})
-            print(f"Generoc-bot model_response : {response.choices}")
-            return redirect(url_for("index", generic_result=generic_response))
+            print(f"Generic-bot model_response : {response.choices}")
+            return redirect(url_for("index", generic_prompt=generic_question, generic_result=generic_response))
 
     return render_template("index.html", 
+        ammar_prompt=request.args.get("ammar_prompt"),
         ammar_result=request.args.get("ammar_result"),
-        generic_result=request.args.get("generic_result"))
+        generic_prompt=request.args.get("generic_prompt"),
+        generic_result=request.args.get("generic_result")        
+        )
 
 
 def generate_prompt(msg):

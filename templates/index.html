@@ -15,7 +15,8 @@
   <h3>Ammar-Bot</h3>
     <input type="text" name="ammar-question" placeholder="Ask me a question"  />
   {% if ammar_result %}
-  <div class="ammar_result">{{ ammar_result }}</div>
+  <div class="ammar_prompt">You: {{ ammar_prompt }}</div>
+  <div class="ammar_result">Bot: {{ ammar_result }}</div>
   {% endif %}
 </div>
 <hr>
@@ -24,7 +25,8 @@
   <h3>Generic-Bot</h3>
     <input type="text" name="generic-question" placeholder="Ask me a question"  />
   {% if generic_result %}
-  <div class="generic_result">{{ generic_result }}</div>
+  <div class="generic_prompt">You: {{ generic_prompt }}</div>
+  <div class="generic_result">Bot: {{ generic_result }}</div>
   {% endif %}
 </div>
 <input type="submit" value="Ask" />
